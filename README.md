@@ -11,7 +11,7 @@ python3 main.py 'URL_GENERATED_BY_THE_CTF_PROBLEM'
 ```
 
 Below is a sample of the script output.
-Note that I shielded my flags in the below output. You should be able to see yours correctly by running the script.
+Note that I shielded my flags from the below output. You should be able to see yours correctly after running the script.
 
 ```
 $ python3 main.py 'http://35.227.24.107/f27874c9b0/?post=4t12rIGa921awTVHfD6-Sp3!YfZS2MuTU1ocM7nX06ZG7iqGzOzstZUKzvnwFmcJfs7SJ8EEsM5SOc2BoptbOpLNp1m-UYxmm0kJMdFFhbt3ELGe!WV5hxlag0a!6fTSkIeIrqe8IDNcD5562DMiI0ph87cS7Glve9YGu6xqHrDIFjuw9vvs5QUJtI3r6-jKhqYP!J!C0UcPS-Ze8p!NGw~~'
