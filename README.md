@@ -10,10 +10,10 @@ To run the script:
 ```
 git clone https://github.com/eggburg/hacker101_CTF_Encrypted_Pastebin.git
 cd hacker101_CTF_Encrypted_Pastebin
-python3 main.py 'URL_GENERATED_BY_THE_CTF_PROBLEM'
+python3 main.py '<URL_GENERATED_BY_THE_CTF_PROBLEM>'
 ```
 
-Below is a sample of the script output.
+Below is a sample of the script input and output.
 Note that I shielded my flags from the below output. You should be able to see yours correctly after running the script.
 
 ```
