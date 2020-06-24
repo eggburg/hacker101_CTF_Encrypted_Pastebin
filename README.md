@@ -1,7 +1,10 @@
 # hacker101_CTF_Encrypted_Pastebin
-Get 3 flags for the Hacker101 CTF problem Encrypted Pastebin
+Get 3 flags for the Hacker101 CTF problem Encrypted Pastebin.
 
-"Encrypted Pastebin" is one of the hardest problems in the Hacker101 CTF. It challenges the user to perform cryptographic attack against the data encrypted using the AES-CBC scheme. In order to get the hidden flags an user has to write scripts to automate the http requests and all the calculations.
+Background: "Encrypted Pastebin" is one of the hardest problems in the Hacker101 CTF (https://ctf.hacker101.com/ctf). It challenges users to perform cryptographic attack against the data encrypted using the AES-CBC scheme. In order to get the hidden flags an user has to write scripts to automate the http requests and all the calculations.
+
+Flags: the problem inculdes 4 flags, where I only found 3 of them. If you know how to get the last flag, kindly share the idea with me!
+
 
 To run the script:
 ```
