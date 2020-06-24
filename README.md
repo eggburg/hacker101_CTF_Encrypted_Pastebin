@@ -12,7 +12,10 @@ cd hacker101_CTF_Encrypted_Pastebin
 python3 main.py '<URL_GENERATED_BY_THE_CTF_PROBLEM>'
 ```
 
+It took my virtual machine around 11 minutes to finish. 
+
 Below is a sample of the script input and output.
+
 Note that I shielded my flags from the below output. You should be able to see yours correctly after running the script.
 
 ```
