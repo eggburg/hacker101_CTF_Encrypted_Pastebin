@@ -2,7 +2,7 @@
 
 Background: "Encrypted Pastebin" is one of the hardest problems in the Hacker101 CTF (https://ctf.hacker101.com/ctf). It challenges users to perform cryptographic attack against the data encrypted using the AES-CBC scheme. In order to get the hidden flags an user has to write scripts to automate the http requests and all the calculations.
 
-Remark: the problem inculdes 4 flags, where I only found 3 of them. If you know how to get the last flag, kindly share the idea with me!
+Remark: the problem inculdes 4 flags. This script will give you the first 3, and I am working the last one !
 
 
 To run the script:
