@@ -1,6 +1,6 @@
 # hacker101_CTF_Encrypted_Pastebin
 
-Background: "Encrypted Pastebin" is one of the hardest problems in the Hacker101 CTF (https://ctf.hacker101.com/ctf). It challenges users to perform cryptographic attack against the data encrypted using the AES-CBC scheme. In order to get the hidden flags an user has to write scripts to automate the http requests and all the calculations.
+Background: "Encrypted Pastebin" is one of the hardest problems in the Hacker101 CTF (https://ctf.hacker101.com/ctf). It challenges users to perform cryptographic attack against the data encrypted using the AES-CBC scheme. In order to get the hidden flags an user has to write scripts to automate all the http requests and calculations.
 
 This script is designed to be user friendly.
 
@@ -11,7 +11,7 @@ cd hacker101_CTF_Encrypted_Pastebin
 python3 main.py '<URL_GENERATED_BY_THE_CTF_PROBLEM>'
 ```
 
-It took my virtual machine around 11 minutes to finish. Below is a sample of the script input and output. 
+It took my virtual machine around 15 minutes to finish. Below is a sample of the script input and output. 
 
 Note that I shielded my flags from the below output. You should be able to see yours correctly after running the script.
 
@@ -42,4 +42,5 @@ INFO get_1st_and_3rd_flag: flags found =
 INFO get_1st_and_3rd_flag: ['^FLAG^.......................$FLAG$', '^FLAG^.....................$FLAG$']
 INFO get_3rd_and_4th_flag: flags found =
 INFO get_3rd_and_4th_flag: ['^FLAG^.......................$FLAG$', '^FLAG^.....................$FLAG$']
+INFO <module>: Duration = 0 hour 15 min 15 sec
 ```
