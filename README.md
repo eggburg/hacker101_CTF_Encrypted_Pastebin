@@ -2,8 +2,7 @@
 
 Background: "Encrypted Pastebin" is one of the hardest problems in the Hacker101 CTF (https://ctf.hacker101.com/ctf). It challenges users to perform cryptographic attack against the data encrypted using the AES-CBC scheme. In order to get the hidden flags an user has to write scripts to automate the http requests and all the calculations.
 
-Remark: the problem inculdes 4 flags. This script will give you the first 3, and I am working the last one !
-
+This script is designed to be user friendly.
 
 To run the script:
 ```
@@ -38,7 +37,9 @@ INFO get_prePT_for_block_b: Done with Block 3
 INFO get_prePT_for_block_b: Done with Block 4
 INFO get_prePT_for_block_b: Done with Block 1
 INFO get_prePT_for_block_b: Done with Block 2
-INFO get_2nd_flag: flag found = ^FLAG^...........................................$FLAG$
+INFO get_2nd_flag: flag found = ^FLAG^.......................$FLAG$
 INFO get_1st_and_3rd_flag: flags found =
-INFO get_1st_and_3rd_flag: ['^FLAG^...........................................$FLAG$', '^FLAG^...........................................$FLAG$']
+INFO get_1st_and_3rd_flag: ['^FLAG^.......................$FLAG$', '^FLAG^.....................$FLAG$']
+INFO get_3rd_and_4th_flag: flags found =
+INFO get_3rd_and_4th_flag: ['^FLAG^.......................$FLAG$', '^FLAG^.....................$FLAG$']
 ```

