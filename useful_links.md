@@ -1,4 +1,4 @@
-These links are the tools I came across and found useful for this CTF problem.
+These are the online tools I came across and found useful for this CTF problem.
 
 
 ### SQL injection commands to extract ...
