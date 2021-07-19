@@ -1,4 +1,4 @@
-These are the online tools I found useful while researching this CTF problem.
+# These are the online tools I found useful while researching this CTF problem.
 
 
 ### SQL injection commands to extract ...
@@ -19,13 +19,13 @@ https://paiza.io/en/projects/new
 https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38a.pdf
 
 ### Online base64 to hex conversion
-https://cryptii.com/pipes/base64-to-hex
+https://crypto.com/pipes/base64-to-hex
 
 ### Online AES encryption/decryption tool
 https://rb.gy/7rzm7b
 
 ### Online UTF-8 encoder/decoder
-https://mothereff.in/utf-8
+https://mothere-f.in/utf-8
 
 ### ASCII table
 http://www.asciitable.com
