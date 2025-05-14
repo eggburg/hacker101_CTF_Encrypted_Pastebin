@@ -1,6 +1,6 @@
 # hacker101_CTF_Encrypted_Pastebin
 
-Background: "Encrypted Pastebin" is one of the hardest problems in the Hacker101 CTF (https://ctf.hacker101.com/ctf). It challenges users to perform cryptographic attack against the data encrypted using the AES-CBC scheme. In order to get the hidden flags an user has to write scripts to automate all the http requests and calculations.
+Background: "Encrypted Pastebin" is one of the hardest problems in the Hacker101 CTF (https://ctf.hacker101.com). It challenges users to perform cryptographic attack against the data encrypted using the AES-CBC scheme. In order to get the hidden flags an user has to write scripts to automate all the http requests and calculations.
 
 This script is designed to be user friendly. It handles http connection errors and retry for the users.
 
